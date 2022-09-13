@@ -1,0 +1,7 @@
+.idea
+geek-cloud.iml
+files
+files-client
+# Project exclude paths
+/geek-cloud-application/target/
+/geek-cloud-server/target/
