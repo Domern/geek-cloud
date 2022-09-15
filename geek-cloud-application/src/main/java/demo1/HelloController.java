@@ -58,23 +58,7 @@ public class HelloController implements Initializable {
 
     }
 
-    public void sendFile(String fileName) {
-        File file = new File("files-client/"+fileName);
-        try (FileInputStream fos = new FileInputStream(file)) {
-            net.writeUTF("#send-file#");
-            net.writeUTF(file.getName());
-            long sise=file.length();
-            byte[] buf=new byte[(int) sise];
-            int x=fos.read(buf);
-            net.writeLong(sise);
-            net.write(buf);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void addFile(){
             File file = new File("files-client/" + net.readUtf());
@@ -112,9 +96,6 @@ public class HelloController implements Initializable {
 
     }
 
-    public void sendFile(ActionEvent actionEvent) {
-        String fileName=clientList.getFocusModel().getFocusedItem();
-        System.out.println(fileName);
-        sendFile(fileName);
+    public void sendToServer(ActionEvent actionEvent) {
     }
 }
