@@ -16,17 +16,15 @@ import java.util.Collection;
 import java.util.ResourceBundle;
 
 public class HelloController implements Initializable {
+    public ListView<String> clientView;
+    public ListView<String> serverView;
     private Net net;
     private File dir;
-    public ListView<String> serverList;
-    public ListView<String> clientList;
-
 
     private void readMessage() {
         try {
             while (true) {
-                clientFileList();
-                String command = net.readUtf();
+                String command = net.inputStream().readUTF();
                 if (command.equals("#list#")) {
                     addFileListFromServer();
                 }else if(command.equals("#add-file#")){
@@ -39,21 +37,21 @@ public class HelloController implements Initializable {
     }
 
     private void addFileListFromServer() throws IOException {
-        Long fileCount = net.reedLong();
+        Long fileCount = net.inputStream().readLong();
         for (int i = 0; i < fileCount; i++) {
-            String fileName = net.readUtf();
-            serverList.getItems().addAll(fileName);
+            String fileName = net.inputStream().readUTF();
+            serverView.getItems().addAll(fileName);
         }
     }
 
 
 
     void clientFileList(){
-        clientList.getItems().clear();
+        clientView.getItems().clear();
         dir=new File("files-client");
         String[] files = dir.list();
         for (String s : files) {
-            clientList.getItems().addAll(s);
+            clientView.getItems().addAll(s);
         }
 
     }
@@ -61,41 +59,66 @@ public class HelloController implements Initializable {
 
 
     private void addFile(){
-            File file = new File("files-client/" + net.readUtf());
-            long x = net.reedLong();
-            byte[] buf = net.read((int) x);
+        try{
+            File file = new File("files-client/" + net.inputStream().readUTF());
+            int x = (int) net.inputStream().readLong();
+            byte[] buf = new byte[x];
+            net.inputStream().read(buf);
             try (FileOutputStream fos = new FileOutputStream(file)) {
                 fos.write(buf);
             } catch (IOException e) {
                 e.printStackTrace();
-
+        }
+    }catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
 
+        @Override
+    public void initialize(URL url, ResourceBundle resourceBundle){
+            try {
+                net = new Net("localhost", 8991);
+                Thread readThread = new Thread(this::readMessage);
+                readThread.setDaemon(true);
+                readThread.start();
+                clientFileList();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        try {
-            net = new Net("localhost", 8991);
-            Thread readThread = new Thread(this::readMessage);
-            readThread.setDaemon(true);
-            readThread.start();
+
+    public void sendToServer(ActionEvent actionEvent) {
+        String filename=clientView.getFocusModel().getFocusedItem();
+        File file=new File("files-client/"+filename);
+        long size= file.length();
+        byte[] buf=new byte[(int) size];
+        try (FileInputStream fis = new FileInputStream(file)) {
+            int x=fis.read(buf);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        try {
+        net.outputStream().writeUTF("#send-file#");
+        net.outputStream().writeUTF(filename);
+        net.outputStream().writeLong(size);
+        net.outputStream().write(buf);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void addFile(ActionEvent actionEvent) {
-        String fileName=serverList.getFocusModel().getFocusedItem();
+
+    public void sengToClient(ActionEvent actionEvent) {
+        String fileName=serverView.getFocusModel().getFocusedItem();
         System.out.println(fileName);
-        net.writeUTF("#add-file#"+fileName);
-
-
-
-    }
-
-    public void sendToServer(ActionEvent actionEvent) {
+        try {
+            net.outputStream().writeUTF("#add-file#"+fileName);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

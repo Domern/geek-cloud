@@ -67,10 +67,10 @@ public class Handler implements Runnable {
 
     public void sendFile(String fileName) throws IOException {
         File file = new File("files/" + fileName);
-        try (FileInputStream fos = new FileInputStream(file)) {
-            int sise = (int) file.length();
-            byte[] buf = new byte[sise];
-            int x = fos.read(buf);
+        try (FileInputStream fis = new FileInputStream(file)) {
+            long sise = (int) file.length();
+            byte[] buf = new byte[(int) sise];
+            int x = fis.read(buf);
             out.writeUTF("#add-file#");
             out.writeUTF(file.getName());
             out.writeLong(sise);

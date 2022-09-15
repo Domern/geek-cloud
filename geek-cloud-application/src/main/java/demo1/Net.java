@@ -1,5 +1,6 @@
 package demo1;
 
+import javax.xml.crypto.Data;
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
@@ -22,58 +23,12 @@ public class Net {
         out = new DataOutputStream(socket.getOutputStream());
     }
 
-    public Long reedLong(){
-        try {
-           long l=in.readLong();
-           return l;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public DataOutputStream outputStream(){
+        return out;
     }
 
-    public String readUtf()  {
-        try {
-          String s=in.readUTF();
-          return s;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public DataInputStream inputStream()  {
+       return in;
     }
-    public byte[] read(int x){
-
-            byte[] buf = new byte[x];
-        try {
-            in.read(buf);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return buf;
-    }
-public void writeUTF(String s){
-    try {
-        out.writeUTF(s);
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-
-public void writeLong(Long l){
-    try {
-        out.writeLong(l);
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-public void write(byte[] b){
-    try {
-        out.write(b);
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-
-
 
 }
