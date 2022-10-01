@@ -2,7 +2,6 @@ package Server;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Arrays;
 
 public class Handler implements Runnable {
     private File dir;
@@ -15,8 +14,6 @@ public class Handler implements Runnable {
         out = new DataOutputStream(socket.getOutputStream());
         System.out.println("Client connected");
         sendFileList();
-        new Thread(() -> readServiceMsg()).start();
-
     }
 
     private void sendFileList() {
@@ -33,21 +30,6 @@ public class Handler implements Runnable {
         }
     }
 
-    private void readServiceMsg() {
-        try {
-            msg = in.readUTF();
-            if (msg.equals("#send-file#")) {
-                receivingFile();
-            } else if (msg.startsWith("#add-file#")) {
-                String fileName = msg.substring(10);
-                        sendFile(fileName);
-            } else if (msg.equals("#list#")) {
-                sendFileList();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void receivingFile() {
         try {
@@ -83,8 +65,25 @@ public class Handler implements Runnable {
         }
     }
 
+    @Override
     public void run() {
-
+        try {
+            while (true) {
+                msg = in.readUTF();
+                if (msg.equals("#send-file#")) {
+                    receivingFile();
+                } else if (msg.startsWith("#add-file#")) {
+                    String fileName = msg.substring(10);
+                    sendFile(fileName);
+                } else if (msg.equals("#list#")) {
+                    sendFileList();
+                } else if (msg.equals("#file-list#")) {
+                    sendFileList();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
