@@ -8,13 +8,15 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("geek-cloud-client.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(),750,500);
-        stage.setTitle("Hello!");
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("geek-cloud-client.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        stage.setTitle("Cloud client!");
         stage.setScene(scene);
         stage.show();
+
     }
 
     public static void main(String[] args) {

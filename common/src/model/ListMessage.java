@@ -9,21 +9,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
-public class ListMessage implements CloudMessage{
-    public final List<String> files;
+public class ListMessage implements CloudMessage {
 
-    public List<String> getFiles() {
-        return files;
-    }
+    private final List<String> files;
 
     public ListMessage(Path path) throws IOException {
-        this.files= Files.list(path) //Stream<Path>
-        .map(p->p.getFileName().toString()) //Stream<String>
-        .collect(Collectors.toList());
-
-
+        this.files = Files.list(path)
+                .map(p -> p.getFileName().toString())
+                .collect(Collectors.toList());
     }
-
 
     @Override
     public MessageType getType() {

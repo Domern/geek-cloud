@@ -1,12 +1,12 @@
 package Netty.serial;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import lombok.extern.slf4j.Slf4j;
 import model.CloudMessage;
 import model.FileMessage;
 import model.FileRequest;
 import model.ListMessage;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,7 +19,7 @@ public class FileHandler extends SimpleChannelInboundHandler<CloudMessage> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         serverDir = Path.of("files");
-        log.debug("Client connected");
+        log.debug("client connected");
         ctx.writeAndFlush(new ListMessage(serverDir));
     }
 

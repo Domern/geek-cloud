@@ -3,15 +3,12 @@ package model;
 import lombok.Getter;
 
 @Getter
-public class FileRequest implements CloudMessage{
-private final String fileName;
+public class FileRequest implements CloudMessage {
+
+    private final String fileName;
 
     public FileRequest(String fileName) {
         this.fileName = fileName;
-    }
-
-    public String getFileName() {
-        return fileName;
     }
 
     @Override

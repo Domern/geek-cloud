@@ -32,8 +32,8 @@ public class FileServer {
                             );
                         }
                     });
-            ChannelFuture channelFuture = bootstrap.bind(8195).sync();
-            log.debug("Server is ready on port: " + 8195);
+            ChannelFuture channelFuture = bootstrap.bind(8100).sync();
+            log.debug("Server is ready on port: " + 8100);
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();

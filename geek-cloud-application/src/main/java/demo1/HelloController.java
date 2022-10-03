@@ -1,15 +1,17 @@
 package demo1;
 
+
+import model.DaemonThreadFactory;
+import model.CloudMessage;
+import model.FileMessage;
+import model.FileRequest;
+import model.ListMessage;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
-import model.CloudMessage;
-import model.FileMessage;
-import model.FileRequest;
-import model.ListMessage;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,18 +23,18 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
-
 public class HelloController implements Initializable {
     public ListView<String> clientView;
     public ListView<String> serverView;
     private String currentDirectory;
 
-    private NetWork<ObjectDecoderInputStream, ObjectEncoderOutputStream> network;
+    private Network<ObjectDecoderInputStream, ObjectEncoderOutputStream> network;
 
     private Socket socket;
 
     private boolean needReadMessages = true;
 
+    private DaemonThreadFactory factory;
 
     public void sengToClient(ActionEvent actionEvent) throws IOException {
         String fileName = serverView.getSelectionModel().getSelectedItem();
@@ -45,20 +47,14 @@ public class HelloController implements Initializable {
     }
 
     private void readMessages() {
+
         try {
             while (needReadMessages) {
                 CloudMessage message = (CloudMessage) network.getInputStream().readObject();
-                System.out.println(message);
-                System.out.println("cloud");
                 if (message instanceof FileMessage fileMessage) {
-                    System.out.println("message");
                     Files.write(Path.of(currentDirectory).resolve(fileMessage.getFileName()), fileMessage.getBytes());
                     Platform.runLater(() -> fillView(clientView, getFiles(currentDirectory)));
                 } else if (message instanceof ListMessage listMessage) {
-                    System.out.println("list");
-                    for (String file : listMessage.getFiles()) {
-                        System.out.println(file);
-                    }
                     Platform.runLater(() -> fillView(serverView, listMessage.getFiles()));
                 }
             }
@@ -68,24 +64,37 @@ public class HelloController implements Initializable {
         }
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    private void initNetwork() {
         try {
-            socket = new Socket("localhost", 8195);
-            network=new NetWork<>(
+            socket = new Socket("localhost", 8100);
+            network = new Network<>(
                     new ObjectDecoderInputStream(socket.getInputStream()),
                     new ObjectEncoderOutputStream(socket.getOutputStream())
             );
-            currentDirectory="files-client";
-            fillView(clientView, getFiles(currentDirectory));
-            Thread readThread = new Thread(this::readMessages);
-            readThread.setDaemon(true);
-            readThread.start();
 
-
-        } catch (IOException e) {
+            factory.getThread(this::readMessages, "cloud-client-read-thread")
+                    .start();
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        needReadMessages = true;
+        factory = new DaemonThreadFactory();
+        initNetwork();
+        setCurrentDirectory("files-client");
+        fillView(clientView, getFiles(currentDirectory));
+        clientView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                String selected = clientView.getSelectionModel().getSelectedItem();
+                File selectedFile = new File(currentDirectory + "/" + selected);
+                if (selectedFile.isDirectory()) {
+                    setCurrentDirectory(currentDirectory + "/" + selected);
+                }
+            }
+        });
     }
 
     private void setCurrentDirectory(String directory) {
