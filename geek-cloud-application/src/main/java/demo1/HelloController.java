@@ -1,11 +1,7 @@
 package demo1;
 
 
-import model.DaemonThreadFactory;
-import model.CloudMessage;
-import model.FileMessage;
-import model.FileRequest;
-import model.ListMessage;
+import model.*;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
 import javafx.application.Platform;
@@ -23,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
+
 public class HelloController implements Initializable {
     public ListView<String> clientView;
     public ListView<String> serverView;
@@ -44,6 +41,13 @@ public class HelloController implements Initializable {
     public void sendToServer(ActionEvent actionEvent) throws IOException {
         String fileName = clientView.getSelectionModel().getSelectedItem();
         network.getOutputStream().writeObject(new FileMessage(Path.of(currentDirectory).resolve(fileName)));
+    }
+    public void addServerFileList(ActionEvent actionEvent) {
+        try {
+            network.getOutputStream().writeObject(new GiveList(""));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void readMessages() {
@@ -95,6 +99,16 @@ public class HelloController implements Initializable {
                 }
             }
         });
+        serverView.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2) {
+                String selected = serverView.getSelectionModel().getSelectedItem();
+                try {
+                    network.getOutputStream().writeObject(new GiveList(selected));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void setCurrentDirectory(String directory) {
@@ -122,6 +136,5 @@ public class HelloController implements Initializable {
         return List.of();
     }
 
-    public void addServerFileList(ActionEvent actionEvent) {
-    }
+
 }

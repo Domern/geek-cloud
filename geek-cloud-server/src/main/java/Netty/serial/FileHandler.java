@@ -1,15 +1,15 @@
 package Netty.serial;
 
-import model.CloudMessage;
-import model.FileMessage;
-import model.FileRequest;
-import model.ListMessage;
+import model.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import static model.MessageType.LIST;
 
 @Slf4j
 public class FileHandler extends SimpleChannelInboundHandler<CloudMessage> {
@@ -31,6 +31,20 @@ public class FileHandler extends SimpleChannelInboundHandler<CloudMessage> {
             ctx.writeAndFlush(new ListMessage(serverDir));
         } else if (cloudMessage instanceof FileRequest fileRequest) {
             ctx.writeAndFlush(new FileMessage(serverDir.resolve(fileRequest.getFileName())));
+        } else if (cloudMessage instanceof GiveList giveList) {
+            if(giveList.equals("..")){
+                serverDir=serverDir.resolve("..");
+                ctx.writeAndFlush(new ListMessage(serverDir));
+            }else {
+                Path dir = serverDir.resolve(giveList.getPath());
+                if (Files.isDirectory(dir)) {
+                    serverDir = serverDir.resolve(Path.of(giveList.getPath()));
+                    ctx.writeAndFlush(new ListMessage(serverDir));
+                }
+            }
         }
+
     }
+
+
 }

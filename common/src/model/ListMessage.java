@@ -13,11 +13,16 @@ public class ListMessage implements CloudMessage {
 
     private final List<String> files;
 
+
+
     public ListMessage(Path path) throws IOException {
         this.files = Files.list(path)
                 .map(p -> p.getFileName().toString())
                 .collect(Collectors.toList());
+        files.add(0, "..");
     }
+
+
 
     @Override
     public MessageType getType() {
