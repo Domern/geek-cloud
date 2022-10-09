@@ -1,6 +1,7 @@
 package demo1;
 
 
+import javafx.scene.control.TextField;
 import model.*;
 import io.netty.handler.codec.serialization.ObjectDecoderInputStream;
 import io.netty.handler.codec.serialization.ObjectEncoderOutputStream;
@@ -23,7 +24,10 @@ import java.util.ResourceBundle;
 public class HelloController implements Initializable {
     public ListView<String> clientView;
     public ListView<String> serverView;
+    public TextField nameClientField;
+    public TextField nameServerField;
     private String currentDirectory;
+    private File selectFile;
 
     private Network<ObjectDecoderInputStream, ObjectEncoderOutputStream> network;
 
@@ -137,4 +141,30 @@ public class HelloController implements Initializable {
     }
 
 
+    public void deleteFileOnClient(ActionEvent actionEvent) throws IOException {
+        String filename=clientView.getSelectionModel().getSelectedItem();
+        Files.delete(Path.of(currentDirectory,filename).normalize());
+        fillView(clientView, getFiles(currentDirectory));
+    }
+
+    public void newFilenameOnClient(ActionEvent actionEvent) throws IOException {
+        String lastFilename=clientView.getSelectionModel().getSelectedItem();
+        String newFileName=nameClientField.getText();
+        if(newFileName.length()>0){
+            Files.copy(Path.of(currentDirectory,lastFilename).normalize(),Path.of(currentDirectory,newFileName).normalize());
+            Files.delete(Path.of(currentDirectory,lastFilename).normalize());
+            fillView(clientView, getFiles(currentDirectory));
+        }
+    }
+
+    public void deleteFileOnServer(ActionEvent actionEvent) throws IOException {
+        String deleteFilename=serverView.getSelectionModel().getSelectedItem();
+        network.getOutputStream().writeObject(new DeleteFile(deleteFilename));
+    }
+
+    public void newFilenameOnServer(ActionEvent actionEvent) throws IOException {
+        String lastFileName=serverView.getSelectionModel().getSelectedItem();
+        String newFileName=nameServerField.getText();
+        network.getOutputStream().writeObject(new NewFileName(lastFileName,newFileName));
+    }
 }
