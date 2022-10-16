@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="442.0" prefWidth="722.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.geekbrains.client.Controller">
+    <ListView fx:id="clientView" layoutX="29.0" layoutY="35.0" prefHeight="299.0" prefWidth="252.0" />
+    <ListView fx:id="serverView" layoutX="443.0" layoutY="35.0" prefHeight="299.0" prefWidth="252.0" />
+    <Button layoutX="290.0" layoutY="110.0" mnemonicParsing="false" onAction="#upload" prefHeight="36.0" prefWidth="150.0" text="Отправить на сервер" />
+    <Button layoutX="291.0" layoutY="162.0" mnemonicParsing="false" onAction="#download" prefHeight="36.0" prefWidth="150.0" text="Загрузить с сервера" />
+    <Button layoutX="291.0" layoutY="214.0" mnemonicParsing="false" onAction="#refreshServerFileList" prefHeight="36.0" prefWidth="150.0" text="Список файлов на сервере" />
+   <Button onAction="#deleteFileOnClient" layoutX="29.0" layoutY="345.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="252.0" text="Удалить" />
+   <Button onAction="#newFilenameOnClient" layoutX="29.0" layoutY="384.0" mnemonicParsing="false" text="Переименовать" />
+   <Button onAction="#deleteFileOnServer" layoutX="443.0" layoutY="345.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="252.0" text="Удалить" />
+   <Button onAction="#newFilenameOnServer" layoutX="443.0" layoutY="384.0" mnemonicParsing="false" text="Переименовать" />
+   <TextField fx:id="nameClientField" layoutX="144.0" layoutY="384.0" prefHeight="25.0" prefWidth="138.0" />
+   <TextField fx:id="nameServerField" layoutX="554.0" layoutY="384.0" prefHeight="25.0" prefWidth="138.0" />
+
+</AnchorPane>

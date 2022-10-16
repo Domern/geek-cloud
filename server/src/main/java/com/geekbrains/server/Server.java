@@ -1,6 +1,5 @@
-package Netty;
+package com.geekbrains.server;
 
-import Netty.serial.FileHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -14,7 +13,7 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class FileServer {
+public class Server {
     public static void main(String[] args) {
         EventLoopGroup auth = new NioEventLoopGroup(1);
         EventLoopGroup worker = new NioEventLoopGroup();
@@ -32,7 +31,7 @@ public class FileServer {
                             );
                         }
                     });
-            ChannelFuture channelFuture = bootstrap.bind(8100).sync();
+            ChannelFuture channelFuture = bootstrap.bind(8200).sync();
             log.debug("Server is ready on port: " + 8100);
             channelFuture.channel().closeFuture().sync();
         } catch (Exception e) {
